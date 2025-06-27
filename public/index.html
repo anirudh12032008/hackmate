@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Scribble</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col items-center justify-start relative overflow-hidden">
+
+  <!-- Title -->
+  <h1 class="text-4xl font-bold mt-6 mb-4">Scribble Pad</h1>
+
+  <!-- Canvas -->
+  <canvas id="canvas" class="border border-gray-300 bg-white w-[90%] h-[75vh] rounded-lg shadow-lg"></canvas>
+  
+  <div id="sidePanel" class="fixed right-0 top-0 h-full w-72 bg-white border-l shadow-lg p-4 transition-transform duration-300 z-20 translate-x-0">
+    <h2 class="text-xl font-semibold mb-6"> Tools</h2>
+
+
+<div class="mb-6">
+  <label class="text-sm font-medium block mb-2">Brush Color</label>
+  <div class="flex flex-wrap gap-2 items-center">
+    <div class="w-8 h-8 rounded-full bg-black cursor-pointer border-2 border-gray-300 hover:scale-105 transition" data-color="#000000"></div>
+    <div class="w-8 h-8 rounded-full bg-red-500 cursor-pointer border-2 border-gray-300 hover:scale-105 transition" data-color="#ef4444"></div>
+    <div class="w-8 h-8 rounded-full bg-blue-500 cursor-pointer border-2 border-gray-300 hover:scale-105 transition" data-color="#3b82f6"></div>
+    <div class="w-8 h-8 rounded-full bg-green-500 cursor-pointer border-2 border-gray-300 hover:scale-105 transition" data-color="#22c55e"></div>
+    <div class="w-8 h-8 rounded-full bg-yellow-400 cursor-pointer border-2 border-gray-300 hover:scale-105 transition" data-color="#facc15"></div>
+
+    <div class="w-8 h-8 rounded-full bg-gradient-to-br from-white to-gray-400 border-2 border-gray-300 cursor-pointer relative group hover:scale-105 transition">
+      <span class="absolute inset-0 flex items-center justify-center text-xs font-bold text-gray-600">+</span>
+      <input type="color" id="colors" class="absolute inset-0 opacity-0 cursor-pointer" />
+    </div>
+  </div>
+</div>
+
+
+<div class="mb-6">
+  <label class="text-sm font-medium block mb-2">Brush Size</label>
+  <div class="flex gap-3 items-center flex-wrap">
+    <div class="w-4 h-4 rounded-full bg-gray-800 cursor-pointer" data-size="3"></div>
+    <div class="w-6 h-6 rounded-full bg-gray-800 cursor-pointer" data-size="8"></div>
+    <div class="w-8 h-8 rounded-full bg-gray-800 cursor-pointer" data-size="15"></div>
+    <div class="w-10 h-10 rounded-full bg-gray-800 cursor-pointer" data-size="22"></div>
+
+    <div class="relative group">
+      <div class="w-8 h-8 rounded-full border-2 border-gray-300 flex items-center justify-center text-xs font-bold text-gray-600 cursor-pointer hover:scale-105 transition">+</div>
+      <input type="range" id="brush" min="1" max="30" value="3" class="absolute opacity-0 w-10 h-10 inset-0 cursor-pointer" />
+    </div>
+  </div>
+</div>
+
+    <!-- Clear Button -->
+    <div class="mb-6">
+      <button id="clear" class="w-full py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg shadow">
+        🧹 Clear Canvas
+      </button>
+    </div>
+  </div>
+
+  <button id="togglePanel" class="fixed top-5 right-72 bg-gray-800 text-white px-3 py-1 rounded-l z-30 hover:bg-gray-900">
+    ☰
+  </button>
+
+  <script>
+    const panel = document.getElementById('sidePanel');
+    const toggle = document.getElementById('togglePanel');
+    let open = true;
+
+    toggle.addEventListener('click', () => {
+      open = !open;
+      panel.style.transform = open ? 'translateX(0)' : 'translateX(100%)';
+      toggle.style.right = open ? '18rem' : '0';
+    });
+  </script>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
