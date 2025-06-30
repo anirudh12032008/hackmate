@@ -5,10 +5,32 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Scribble</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+
+  .cursor-brush {
+    cursor: url('./c1.png'), auto;
+  }
+  .cursor-eraser {
+    cursor: url('./c2.png'), auto;
+  }
+  .cursor-line {
+    cursor: url('./c3.png'), auto;
+  }
+  .cursor-image {
+    cursor: url('./c4.png'), auto;
+  }
+  .cursor-text {
+    cursor: url('./c5.png'), auto;
+  }
+</style>
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col items-center justify-start relative overflow-hidden">
 
   <h1 class="text-4xl font-bold mt-6 mb-4">Scribble Pad</h1>
+  <h2 class="text-center text-2xl mt-1">
+  Room Code: <span id="code" class="font-mono text-black">...</span>
+</h2>
+
 
   <canvas id="canvas" class="border border-gray-300 bg-white w-[95%] h-[150vh] rounded-lg shadow-lg"></canvas>
   
@@ -71,7 +93,7 @@
 <div class="space-y-3">
 
  <button id="eraser" class="w-full py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg shadow">
-  🧽 Eraser
+ Eraser
 </button>
 
 
@@ -97,6 +119,7 @@
   <button id="addImage" class="w-full py-2 bg-blue-100 hover:bg-blue-200 text-blue-800 rounded-lg shadow">
     🖼️ Add Image
   </button>
+<input type="file" id="imgInput" accept="image/*" class="hidden" />
 
   <button id="addText" class="w-full py-2 bg-green-100 hover:bg-green-200 text-green-800 rounded-lg shadow">
     🅰️ Add Text
