@@ -3,6 +3,8 @@ const cvs = document.getElementById('canvas');
 const ctx = cvs.getContext('2d');
 cvs.width = window.innerWidth * 0.95;
 cvs.height = window.innerHeight * 1.5;
+const chat = document.getElementById('chat');
+const bchat = document.getElementById('bchat');
 const clrInp = document.getElementById('colors');
 const szInp = document.getElementById('brush');
 const clrBtn = document.getElementById('clear');
@@ -35,6 +37,8 @@ let isAddingImage = false;
 let isDraw = false;
 let isErase = false;
 let isLine = false;
+let pendingImage = null;
+
 let linePt = null;
 imgBtn.addEventListener("click", () => {
 isAddingImage = !isAddingImage;
@@ -249,6 +253,7 @@ room
 ioSock.on('draw', ({ x, y, color, size }) => draw(x, y, color, size));
 ioSock.on('line', ({ x1, y1, x2, y2, color, size }) => drawLineSeg(x1, y1, x2, y2, color, size));
 ioSock.on('clear', () => ctx.clearRect(0, 0, cvs.width, cvs.height));
+ioSock.on('textdraw')
 ioSock.on("image", ({ x, y, src }) => {
 const img = new Image();
 img.src = src;
@@ -268,4 +273,93 @@ save();
 ioSock.on("sync-canvas", ({ dataUrl }) => {
 restore(dataUrl);
 });
+
+bchat.addEventListener('click', hchat);
+chat.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+        hchat();
+    }
+});
+
+async function hchat() {
+    const message = chat.value.trim();
+    if (!message) return;
+    chat.value = '';
+
+    if (message.startsWith('draw ')) {
+        const prompt = message.replace('draw ', '');
+
+        try {
+            const res = await fetch('/api/generate-image', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ prompt })
+            });
+
+            if (!res.ok) {
+                alert('Could not find an image for that search.');
+                return;
+            }
+
+            const result = await res.json();
+            const imageUrl = result.imageUrl;
+
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            img.src = imageUrl;
+
+            img.onload = () => {
+
+                const placeImage = (e) => {
+                    const x = e.clientX - cvs.offsetLeft;
+                    const y = e.clientY - cvs.offsetTop + 30;
+                    const w = 300;
+                    const h = w * (img.height / img.width);
+
+                    ctx.drawImage(img, x, y, w, h);
+                    save();
+                    emitImage(x, y, imageUrl);
+
+                    cvs.removeEventListener('click', placeImage);
+                };
+
+                cvs.addEventListener('click', placeImage);
+            };
+
+        } catch (err) {
+            alert('Failed to fetch image.');
+            console.error(err);
+        }
+
+    } else if (message.startsWith('write ')) {
+        const txt = message.slice(6);
+
+
+        const placeText = (e) => {
+            const x = e.clientX - cvs.offsetLeft;
+            const y = e.clientY - cvs.offsetTop + 30;
+
+            ctx.fillStyle = clrInp.value;
+            ctx.font = `${szInp.value * 6}px sans-serif`;
+            ctx.fillText(txt, x, y);
+
+            save();
+            emitText(x, y, txt);
+
+            cvs.removeEventListener('click', placeText);
+        };
+
+        cvs.addEventListener('click', placeText);
+
+    } else {
+        alert('Type either "draw something" or "write something".');
+    }
+}
+
+
+
+// function hchat() {
+
+
 updateCursor();
+
